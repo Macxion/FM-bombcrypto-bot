@@ -37,7 +37,7 @@ telegram_notify = True
 # ao falar com o @BotFather, no próprio telegram mesmo, igual o site oficial orienta
 # link https://core.telegram.org/bots#3-how-do-i-create-a-bot
 # !APENAS VALORES DE TEXTO, COM ASPAS
-bot_token = '600166001:AAE0G46HWnPHqDJD2Ap1MmtiNFRmoZswpTs'
+bot_token = ''
 
 # Se decidiu receber notificações por telegram e informou o bot_token, você também deve
 # informa o chat_id, ele é o Id da sua conversa com o bot, para descobrir seu chatId,
@@ -45,7 +45,7 @@ bot_token = '600166001:AAE0G46HWnPHqDJD2Ap1MmtiNFRmoZswpTs'
 # substituindo o <token> pelo token recebido do @BotFather, procure pela chave "id" no json
 # recebido, esse é o chatId
 # !APENAS VALORES DE TEXTO, COM ASPAS
-chat_id = '593069474'
+chat_id = ''
 
 # Informe a partir de que horário (formato 24h, ex: 15:30) deseja que o bot envie um print da
 # quantia total de bcoin até o momento, pelo Telegram, apenas  uma vez
