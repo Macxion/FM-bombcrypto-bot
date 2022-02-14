@@ -132,6 +132,18 @@ def found_img(window, img, click=False, refresh=True):
     print(loc)'''
 
 
+def accept_terms_if_did_not(window):
+    """
+    Aceita os termos de uso, inserido na versão 31 do jogo
+    :param window: Janela atual (multijanelas)
+    :return: Boolean
+    """
+    if not window['login']:
+        if not found_img(window, "connect_wallet.png", refresh=False):
+            if found_img(window, "i_accept.png", True):
+                return found_img(window, "accept.png", True)
+
+
 def connect_wallet(window):
     """
     Conecta e assina o smart contract
@@ -276,6 +288,7 @@ def actions(window):
         window['login'] = window['farming'] = False
         reload(window)
 
+    accept_terms_if_did_not(window)
     connect_wallet(window)
     go_to_work(window)
     go_to_treasure_hunt(window)

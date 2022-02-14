@@ -27,7 +27,7 @@ como na imagem de exemplo a seguir:
 Ou seja, ele é **multi-account** e também **multi-platform**,
 pois roda no Windows, Linux, Mac... coisa boa hein? Quanto ao
 funcionamento, ele é bem simples:
-* Executa o login.
+* Executa o login assinando os termos de uso quando solicitado.
 * Coloca os bheroes para trabalhar, **todos de uma vez**.
 * De x em x segundos (**time_to_refresh**, configurável), volta à tela inicial
 e sai do jogo (para fugir dos bugs de bheroes eventualmente
@@ -94,7 +94,7 @@ no terminal.
 Se a resposta for sim, que bom que te ajudamos! Para
 ajudar o projeto a crescer mais ainda e motivar as
 pessoas por trás disso, considere fazer uma doação.
-#### `:notes:` Dê um trocado a seus Devs, oh vale abundante, oh vale abundante, ôô Ô ... `:musical_note:`
+#### 🎶 Dê um trocado a seus Devs, oh vale abundante, oh vale abundante, ôô Ô ... 🎵
 
 Utilize o QR-Code ou copie o endereço da carteira
 do projeto para transferir.
