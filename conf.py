@@ -31,7 +31,7 @@ max_attempt_found_img = 60
 # normalmente, se por algum motivo ele parar de notificar, você tem a ciência de que
 # o programa parou de executar
 # !APENAS VALORES BOOLEANOS, True OU False, SEM ASPAS
-telegram_notify = True
+telegram_notify = False
 
 # Se decidiu receber notificações por telegram, informe o token de autenticação recebido
 # ao falar com o @BotFather, no próprio telegram mesmo, igual o site oficial orienta

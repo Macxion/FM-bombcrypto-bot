@@ -26,7 +26,7 @@ def telegram_send(text):
     :param text: Mensagem a ser enviada
     :return: None
     """
-    if telegram_notify:
+    if telegram_notify and bool(bot_token and not bot_token.isspace()) and bool(chat_id and not chat_id.isspace()):
         send = 'https://api.telegram.org/bot' + bot_token +\
                '/sendMessage?chat_id=' + chat_id + '&parse_mode=Markdown&text=' + text
         requests.get(send)
@@ -41,10 +41,11 @@ def telegram_send_photo(photo_path, caption):
     :param caption: Um caption para a foto
     :return: None
     """
-    url = 'https://api.telegram.org/bot' + bot_token + '/sendPhoto'
-    data = {'chat_id': chat_id, 'caption': caption}
-    files = {'photo': open(photo_path, 'rb')}
-    requests.post(url, files=files, data=data)
+    if telegram_notify and bool(bot_token and not bot_token.isspace()) and bool(chat_id and not chat_id.isspace()):
+        url = 'https://api.telegram.org/bot' + bot_token + '/sendPhoto'
+        data = {'chat_id': chat_id, 'caption': caption}
+        files = {'photo': open(photo_path, 'rb')}
+        requests.post(url, files=files, data=data)
 
 
 def get_windows_running_game():
@@ -86,17 +87,19 @@ def print_screen():
     return sct_img
 
 
-def found_img(window, img, click=False, refresh=True):
+def found_img(window, img, click=False, refresh=True, max_attempt=0):
     """
     Acha imagem requerida no print atual da tela
     :param window: Janela atual (multijanelas)
     :param img: Nome da imagem
     :param click: Se é para clicar na imagem quando achar
     :param refresh: Se é para recarregar o browser ao atingir o limite
+    :param max_attempt: Máximo de tentativas, se quiser substituir o global
     :return: Boolean
     """
     attempt = 0
-    while attempt < max_attempt_found_img:
+    true_max_attempt = max_attempt_found_img if max_attempt == 0 else max_attempt
+    while attempt < true_max_attempt:
         img_rgb = print_screen()
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
         template = cv2.imread(img_path + img, 0)
@@ -116,9 +119,9 @@ def found_img(window, img, click=False, refresh=True):
 
             break
 
-    if attempt == max_attempt_found_img:
+    if attempt == true_max_attempt:
         window['login'] = False
-        telegram_send(f"Janela {window['index']}: {max_attempt_found_img} tentativas atingidas ao procurar a imagem {img}")
+        telegram_send(f"Janela {window['index']}: {true_max_attempt} tentativas atingidas ao procurar a imagem {img}")
         if refresh:
             reload(window)
 
@@ -139,9 +142,12 @@ def accept_terms_if_did_not(window):
     :return: Boolean
     """
     if not window['login']:
-        if not found_img(window, "connect_wallet.png", refresh=False):
-            if found_img(window, "i_accept.png", True):
-                return found_img(window, "accept.png", True)
+        while found_img(window, "unity.png", refresh=False, max_attempt=3):
+            continue
+        else:
+            if not found_img(window, "connect_wallet.png", refresh=False, max_attempt=5):
+                if found_img(window, "i_accept.png", True):
+                    return found_img(window, "accept.png", True)
 
 
 def connect_wallet(window):
