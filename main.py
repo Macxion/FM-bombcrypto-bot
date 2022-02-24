@@ -27,7 +27,7 @@ def telegram_send(text):
     :return: None
     """
     if telegram_notify and bool(bot_token and not bot_token.isspace()) and bool(chat_id and not chat_id.isspace()):
-        send = 'https://api.telegram.org/bot' + bot_token +\
+        send = 'https://api.telegram.org/bot' + bot_token + \
                '/sendMessage?chat_id=' + chat_id + '&parse_mode=Markdown&text=' + text
         requests.get(send)
         time.sleep(1)
@@ -46,6 +46,7 @@ def telegram_send_photo(photo_path, caption):
         data = {'chat_id': chat_id, 'caption': caption}
         files = {'photo': open(photo_path, 'rb')}
         requests.post(url, files=files, data=data)
+        time.sleep(1)
 
 
 def get_windows_running_game():
@@ -55,7 +56,7 @@ def get_windows_running_game():
     :return: None
     """
     i = 1
-    for w in pygetwindow.getWindowsWithTitle('Bombcrypto - '):
+    for w in pygetwindow.getWindowsWithTitle('Bombcrypto '):
         windows.append({
             'window': w,
             'index': str(i),
@@ -69,7 +70,30 @@ def get_windows_running_game():
 
     n = len(windows)
     s = '' if n == 1 else 's'
-    telegram_send(f"Opa, encontrei {n} janela{s} do browser rodando o Bombcrypto, iniciando os trabalhos...")
+    msg = "Nenhuma janela encontrada! Finalizando..." \
+        if n == 0 else \
+        f"Opa, encontrei {n} janela{s} do browser rodando o Bombcrypto, iniciando os trabalhos..."
+    telegram_send(msg)
+    if n == 0:
+        print(msg)
+        exit()
+    if not login_with_metamask:
+        # Adiciona um username e um password a cada janela encontrada, de acordo com a variável login_credentials
+        usernames = login_credentials.keys()
+        user_list = list(usernames)
+        passwords = login_credentials.values()
+        pass_list = list(passwords)
+        if n == len(user_list) == len(pass_list):
+            i = 0
+            for w in windows:
+                w['username'] = user_list[i]
+                w['password'] = pass_list[i]
+                i += 1
+        else:
+            msg = "Número de username/password diferentes do número de janelas encontradas, finalizando..."
+            telegram_send(msg)
+            print(msg)
+            exit()
 
 
 def print_screen():
@@ -114,7 +138,7 @@ def found_img(window, img, click=False, refresh=True, max_attempt=0):
             _, _, _, max_loc = cv2.minMaxLoc(res)
             loc = (max_loc[0] + w / 2, max_loc[1] + h / 2)
             if click:
-                pyautogui.moveTo(loc[0], loc[1], duration=1.5, tween=pyautogui.easeInOutQuad)
+                pyautogui.moveTo(loc[0], loc[1], duration=0.7, tween=pyautogui.easeInOutQuad)
                 pyautogui.click()
 
             break
@@ -152,31 +176,69 @@ def accept_terms_if_did_not(window):
 
 def connect_wallet(window):
     """
-    Conecta e assina o smart contract
+    Clica para escolher método de conexão ao jogo
     :param window: Janela atual (multijanelas)
     :return: None
     """
     if not window['login']:
         if found_img(window, "connect_wallet.png", True):
-            pyautogui.hotkey('ctrl', 'pgup')
-            if found_img(window, "activity.png", True):
-                if found_img(window, "signature_request.png", True, False):
-                    if found_img(window, "sign.png", True):
-                        if found_img(window, "assets.png", True):
-                            pyautogui.hotkey('ctrl', 'pgup')
-                            if found_img(window, "treasure_hunt.png"):
-                                telegram_send(f"Janela {window['index']}: carteira conectada")
-                                window['login'] = True
-                                window['time_to_refresh'] = time.time()
-                                if window['time_to_rest'] == 0:
-                                    window['time_to_rest'] = time.time()
-                else:
-                    # As vezes ocorre de não aparecer a solicitação de assinatura, algum
-                    # bug da metamask, voltamos ao estado inicial da tela da metamask, mudamos
-                    # pro bomb e damos um reload
+            login(window) if not login_with_metamask else connect_with_metamask(window)
+            if not window['login'] and found_img(window, "treasure_hunt.png"):
+                login_method = "localmente" if not login_with_metamask else "com a Metamask"
+                telegram_send(f"Janela {window['index']}: conectado {login_method}")
+                window['login'] = True
+                window['time_to_refresh'] = time.time()
+                if window['time_to_rest'] == 0:
+                    window['time_to_rest'] = time.time()
+
+
+def login(window):
+    """
+    Método de login com usuário e senha, inserido na versão 33 do jogo
+    :param window: Janela atual (multijanelas)
+    :return: None
+    """
+    if found_img(window, "username.png", True):
+        time.sleep(0.7)
+        pyautogui.write(window['username'], interval=0.1)
+        if found_img(window, "password.png", True):
+            time.sleep(0.7)
+            pyautogui.write(window['password'], interval=0.1)
+            if found_img(window, "login.png", True):
+                if found_img(window, "invalid_credentials.png", refresh=False, max_attempt=7):
+                    window['window'].close()
+                    msg = f"Janela {window['index']}:"
+                    telegram_send(f"{msg} credenciais inválidas, fechando janela...")
+                    for i in range(len(windows)):
+                        if windows[i]['index'] == window['index']:
+                            del windows[i]
+                            break
+                    if not windows:
+                        telegram_send(f"{msg} nenhuma janela aberta, finalizando...")
+                        print(f"{msg} nenhuma janela aberta, finalizando...")
+                        exit()
+
+
+def connect_with_metamask(window):
+    """
+    Método de login com a Metamask, assinando o smart contract
+    :param window: Janela atual (multijanelas)
+    :return: None
+    """
+    if found_img(window, "connect_metamask.png", True):
+        pyautogui.hotkey('ctrl', 'pgup')
+        if found_img(window, "activity.png", True):
+            if found_img(window, "signature_request.png", True, False):
+                if found_img(window, "sign.png", True):
                     if found_img(window, "assets.png", True):
                         pyautogui.hotkey('ctrl', 'pgup')
-                        reload(window)
+            else:
+                # As vezes ocorre de não aparecer a solicitação de assinatura, algum
+                # bug da metamask, voltamos ao estado inicial da tela da metamask, mudamos
+                # pro bomb e damos um reload
+                if found_img(window, "assets.png", True):
+                    pyautogui.hotkey('ctrl', 'pgup')
+                    reload(window)
 
 
 def go_to_work(window):
@@ -187,6 +249,7 @@ def go_to_work(window):
     """
     if window['login'] and not window['working']:
         if found_img(window, "heroes.png", True):
+            time.sleep(1.7)
             if found_img(window, "work_all.png", True):
                 if found_img(window, "close_work.png", True):
                     if found_img(window, "treasure_hunt.png"):
@@ -224,9 +287,13 @@ def go_back_main_if_no_error(window):
                 found_error_bar = True
                 break
 
-        if not found_error_bar and found_img(window, "back.png", True):
-            telegram_send(f"Janela {window['index']}: voltando para a tela inicial")
-            time.sleep(3)
+        if not found_error_bar:
+            def back():
+                if found_img(window, "back.png", True):
+                    telegram_send(f"Janela {window['index']}: voltando para a tela inicial")
+                    time.sleep(3)
+
+            back() if found_img(window, "new_map.png", True, False, 3) else back()
 
 
 def notify_ammount_bcoin(window):

@@ -26,6 +26,27 @@ time_to_refresh = 360
 # !APENAS VALORES NUMÉRICOS
 max_attempt_found_img = 60
 
+# Se deseja ou não fazer login utilizando a Metamask, o padrão é True, mas, se você
+# optar por False, tenha certeza de já ter criado seu login de usuário do Bombcrypto,
+# se deseja logar sem a Metamask e tem dúvidas de como criar seu login, entre nos
+# canais oficiais e veja o procedimento, no grupo https://t.me/BombCryptoBR você
+# encontra o passo a passo na mensagem fixada #33, o padrão é True
+# !APENAS VALORES BOOLEANOS, True OU False, SEM ASPAS
+login_with_metamask = True
+
+# Se optou por NÃO fazer login utilizando a Metamask e já criou seu login e senha do
+# Bomcrypto, basta substituir os valores em username e password, MUITA ATENÇÃO se
+# você está utilizando multiaccount, ou seja, mais de uma janela aberta com o jogo,
+# duplique a linha "'username': 'password'," e vá colocando novos usuários e senhas
+# de acordo com as contas que você configurou, informe as credenciais corretas, pois
+# se o bot identificar o erro "Invalid username or password", a janela em questão será
+# fechada, o número de janelas abertas deve ser igual ao número de pares username:password
+# fornecidos
+# !APENAS VALORES DE TEXTO, COM ASPAS, ESSA VARIÁVEL É UM DICTIONARY, MANTENHA O PADRÃO
+login_credentials = {
+    'username': 'password',
+}
+
 # Se quer receber notificações do bot pelo telegram, sugerimos habilitar o envio de
 # mensagens com True, pois a idéia é deixar esse bot rodando e ir viver sua vida
 # normalmente, se por algum motivo ele parar de notificar, você tem a ciência de que

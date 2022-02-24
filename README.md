@@ -1,4 +1,8 @@
 # FM-bombcrypto-bot
+
+Antes de começar, fique sempre de olho no **[CHANGELOG](CHANGELOG.md)** para saber
+quais foram as últimas atualizações do Bot, obrigado!
+
 ![Bombcrypto](readme-images/bombcrypto.gif)
 
 Bot de código aberto para o [Bombcrypto](https://bombcrypto.io/),
@@ -24,10 +28,15 @@ como na imagem de exemplo a seguir:
 
 ![Print](readme-images/print-window.jpg)
 
+Se você optar pelo login com **username e password** introduzido
+na versão **33** do jogo, não será necessária a aba com a Metamask
+aberta, mas ainda sim será necessário janelas diferentes em caso de
+várias contas!
+
 Ou seja, ele é **multi-account** e também **multi-platform**,
 pois roda no Windows, Linux, Mac... coisa boa hein? Quanto ao
 funcionamento, ele é bem simples:
-* Executa o login assinando os termos de uso quando solicitado.
+* Executa o login (comum ou via Metamask) assinando os termos de uso quando solicitado.
 * Coloca os bheroes para trabalhar, **todos de uma vez**.
 * De x em x segundos (**time_to_refresh**, configurável), volta à tela inicial
 e sai do jogo (para fugir dos bugs de bheroes eventualmente
