@@ -2,11 +2,13 @@ import time
 import datetime
 import os
 import pyautogui
-import pygetwindow
 import cv2
-import mss
 import requests
 import numpy as np
+import platform
+if platform.system() != 'Linux':
+    import pygetwindow
+    import mss
 from conf import *
 
 # Altura e largura, são populados no print_screen()
@@ -15,7 +17,7 @@ screen_width = screen_height = 0
 # Endereço da pasta das imagens
 img_path = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'pics' + os.sep
 
-# Janelas do navegador encontradas
+# Janelas do navegador encontradas, ou abas, se informados vários username/password
 windows = []
 
 
@@ -49,51 +51,80 @@ def telegram_send_photo(photo_path, caption):
         time.sleep(1)
 
 
+def die(text):
+    """
+    Morre
+    :param text: Mensagem
+    :return: None
+    """
+    msg = f"{text}. Finalizando..."
+    telegram_send(msg)
+    print(msg)
+    exit()
+
+
 def get_windows_running_game():
     """
-    Encontra as janelas com o jogo aberto e cria um dictionary de controle para cada uma,
-    mesmo se o jogo estiver em browsers diferentes
+    Encontra as janelas (ou abas) com o jogo aberto e cria um dictionary de controle para cada uma
     :return: None
     """
     i = 1
-    for w in pygetwindow.getWindowsWithTitle('Bombcrypto '):
-        windows.append({
-            'window': w,
-            'index': str(i),
-            'login': False,
-            'working': False,
-            'farming': False,
-            'time_to_refresh': 0,
-            'time_to_rest': 0
-        })
-        i += 1
+    if login_with_metamask:
+        # Se o login for via Metamask, o bot contará o número de JANELAS abertas no jogo e
+        # percorrerá cada uma delas, cada janela deve ter duas abas, uma para o jogo e outra
+        # para a Metamask em tela cheia
+        if platform.system() == 'Linux':
+            msg = f"O login com a Metamask não é suportado pelo Linux, pois no momento, não há " \
+                  f"suporte para o módulo PyGetWindow, que é necessário, informe False para a " \
+                  f"variável login_with_metamask no arquivo conf.py e também o(s) username(s) " \
+                  f"e password(s) na variável login_credentials"
+            die(msg)
 
-    n = len(windows)
-    s = '' if n == 1 else 's'
-    msg = "Nenhuma janela encontrada! Finalizando..." \
-        if n == 0 else \
-        f"Opa, encontrei {n} janela{s} do browser rodando o Bombcrypto, iniciando os trabalhos..."
-    telegram_send(msg)
-    if n == 0:
-        print(msg)
-        exit()
-    if not login_with_metamask:
-        # Adiciona um username e um password a cada janela encontrada, de acordo com a variável login_credentials
+        for w in pygetwindow.getWindowsWithTitle('Bombcrypto '):
+            windows.append({
+                'window': w,
+                'index': str(i),
+                'login': False,
+                'working': False,
+                'farming': False,
+                'time_to_refresh': 0,
+                'time_to_rest': 0
+            })
+            i += 1
+    else:
+        # Se o login for por usuário e senha, o número de ABAS abertas com o jogo deve ser igual
+        # ao número de pares de username/password informados em login_credentials, no conf.py
         usernames = login_credentials.keys()
         user_list = list(usernames)
         passwords = login_credentials.values()
         pass_list = list(passwords)
-        if n == len(user_list) == len(pass_list):
-            i = 0
-            for w in windows:
-                w['username'] = user_list[i]
-                w['password'] = pass_list[i]
+        if len(user_list) == len(pass_list) and len(user_list) > 0:
+            for x in range(len(user_list)):
+                windows.append({
+                    'index': str(i),
+                    'login': False,
+                    'working': False,
+                    'farming': False,
+                    'time_to_refresh': 0,
+                    'time_to_rest': 0,
+                    'username': user_list[x],
+                    'password': pass_list[x]
+                })
                 i += 1
+
         else:
-            msg = "Número de username/password diferentes do número de janelas encontradas, finalizando..."
-            telegram_send(msg)
-            print(msg)
-            exit()
+            die("Número de username/password diferentes")
+
+    n = len(windows)
+    s = '' if n == 1 else 's'
+    aj = 'janela' if login_with_metamask else 'aba'
+    msg = f"Nenhuma {aj} encontrada! Finalizando..." \
+        if n == 0 else \
+        f"Opa, encontrei {n} {aj}{s} do browser rodando o Bombcrypto, iniciando os trabalhos..."
+    telegram_send(msg)
+    # Não é login com a Metamask, portando não há controle de janelas, agora são abas,
+    # serve para sair do terminal aberto, se houver abas
+    die(msg) if n == 0 else pyautogui.hotkey('alt', 'tab')
 
 
 def print_screen():
@@ -101,14 +132,17 @@ def print_screen():
     Print da primeira tela e atualização da altura e largura do monitor
     :return: Array
     """
-    with mss.mss() as sct:
-        monitor = sct.monitors[0]
-        sct_img = sct.grab(monitor)
-        global screen_width, screen_height
-        screen_width, screen_height = sct_img.size
-        sct_img = np.array(sct_img)
+    global screen_width, screen_height
+    sct_img = None
+    if platform.system() != 'Linux':
+        with mss.mss() as sct:
+            monitor = sct.monitors[0]
+            sct_img = sct.grab(monitor)
+    else:
+        sct_img = pyautogui.screenshot()
 
-    return sct_img
+    screen_width, screen_height = sct_img.size
+    return np.array(sct_img)
 
 
 def found_img(window, img, click=False, refresh=True, max_attempt=0):
@@ -184,7 +218,7 @@ def connect_wallet(window):
         if found_img(window, "connect_wallet.png", True):
             login(window) if not login_with_metamask else connect_with_metamask(window)
             if not window['login'] and found_img(window, "treasure_hunt.png"):
-                login_method = "localmente" if not login_with_metamask else "com a Metamask"
+                login_method = "com usuário e senha" if not login_with_metamask else "via Metamask"
                 telegram_send(f"Janela {window['index']}: conectado {login_method}")
                 window['login'] = True
                 window['time_to_refresh'] = time.time()
@@ -214,9 +248,7 @@ def login(window):
                             del windows[i]
                             break
                     if not windows:
-                        telegram_send(f"{msg} nenhuma janela aberta, finalizando...")
-                        print(f"{msg} nenhuma janela aberta, finalizando...")
-                        exit()
+                        die(f"{msg} nenhuma janela aberta")
 
 
 def connect_with_metamask(window):
@@ -371,9 +403,13 @@ if __name__ == '__main__':
     get_windows_running_game()
     while True:
         for current in windows:
-            current['window'].activate()
-            if not current['window'].isMaximized:
-                current['window'].maximize()
+            if login_with_metamask:
+                current['window'].activate()
+                if not current['window'].isMaximized:
+                    current['window'].maximize()
 
             actions(current)
             time.sleep(2)
+            if not login_with_metamask and len(windows) > 1:
+                pyautogui.hotkey('ctrl', 'tab')
+                time.sleep(2)

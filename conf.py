@@ -5,7 +5,7 @@
 # ele está errando, pela mesma imagem, na sua resolução, assim irá funcionar, o padrão
 # é 0.9
 # !APENAS VALORES NUMÉRICOS de 0.6 até 0.9
-threshold = 0.9
+threshold = 0.8
 
 # Delay para logar novamente e colocar todos os bhero para trabalhar, informe sempre
 # o tempo em segundos, calcule um tempo legal em que todos os seus bhero se recuperam
@@ -62,13 +62,13 @@ bot_token = ''
 
 # Se decidiu receber notificações por telegram e informou o bot_token, você também deve
 # informa o chat_id, ele é o Id da sua conversa com o bot, para descobrir seu chatId,
-# mande uma mensagem para o seu bot, após isso, ecesse o link https://api.telegram.org/bot<token>/getUpdates,
+# mande uma mensagem para o seu bot, após isso, acesse o link https://api.telegram.org/bot<token>/getUpdates,
 # substituindo o <token> pelo token recebido do @BotFather, procure pela chave "id" no json
 # recebido, esse é o chatId
 # !APENAS VALORES DE TEXTO, COM ASPAS
 chat_id = ''
 
 # Informe a partir de que horário (formato 24h, ex: 15:30) deseja que o bot envie um print da
-# quantia total de bcoin até o momento, pelo Telegram, apenas  uma vez
+# quantia total de bcoin até o momento, pelo Telegram, apenas  uma vez, a cada 24h
 # !APENAS VALORES DE TEXTO, COM ASPAS
 time_notify_ammount_of_bcoin = '09:00'

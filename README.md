@@ -30,8 +30,10 @@ como na imagem de exemplo a seguir:
 
 Se você optar pelo login com **username e password** introduzido
 na versão **33** do jogo, não será necessária a aba com a Metamask
-aberta, mas ainda sim será necessário janelas diferentes em caso de
-várias contas!
+aberta, se você tiver várias contas, basta abrir mais uma aba com o jogo
+e configurar os usernames e passwords na variável **login_credentials**,
+no arquivo **conf.py**. O número de abas abertas deve ser igual ao
+número de usuários e senhas configurados! Esteja avisado.
 
 Ou seja, ele é **multi-account** e também **multi-platform**,
 pois roda no Windows, Linux, Mac... coisa boa hein? Quanto ao
@@ -87,11 +89,13 @@ anteriormente digitando **cd caminho/salvo/fm-bombcrypto-bot**,
 obviamente, o caminho será colado no terminal.
 * Instale as dependências do projeto digitando o comando
 **pip install -r requirements.txt**.
+* Se você utiliza Linux, rode também o seguinte comando no
+terminal: **apt install scrot python3-tk python3-dev**.
   
 ## Utilização
 * Configure as variáveis de sua preferência no arquivo
 **conf.py**, se necessário.
-* Com as janelas do browser já abertas, como explicado
+* Com as janelas (ou abas, dependendo do tipo de login) do browser já abertas, como explicado
 ali em capacidades, execute o comando:
 **python caminho/salvo/fm-bombcrypto-bot/main.py** e
 aperte ENTER.
