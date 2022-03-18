@@ -3,7 +3,7 @@
 # se mesmo após vários testes o bot ainda continuar clicando no lugar inesperado, entre
 # na pasta pics onde encontram-se todos os "alvos clicáveis" e substitua a imagem que
 # ele está errando, pela mesma imagem, na sua resolução, assim irá funcionar, o padrão
-# é 0.9
+# é 0.7
 # !APENAS VALORES NUMÉRICOS de 0.6 até 0.9
 threshold = 0.7
 

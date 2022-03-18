@@ -101,6 +101,8 @@ ali em capacidades, execute o comando:
 aperte ENTER.
 * Para cancelar o bot, basta executar um **Ctrl + c**
 no terminal.
+* Lembre-se de sempre acessar o Bombcrypto pelo endereço
+**https://app.bombcrypto.io/webgl/index.html**.
   
 ## Conseguimos te ajudar?
 ### Consegue ganhar dinheiro enquanto faz outras coisas utilizando nosso bot?
