@@ -11,9 +11,6 @@ if platform.system() != 'Linux':
     import mss
 from conf import *
 
-# Altura e largura, são populados no print_screen()
-screen_width = screen_height = 0
-
 # Endereço da pasta das imagens
 img_path = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'pics' + os.sep
 
@@ -124,7 +121,11 @@ def get_windows_running_game():
     telegram_send(msg)
     # Não é login com a Metamask, portando não há controle de janelas, agora são abas,
     # serve para sair do terminal aberto, se houver abas
-    die(msg) if n == 0 else pyautogui.hotkey('alt', 'tab')
+    if n == 0:
+        die(msg)
+    else:
+        pyautogui.hotkey('alt', 'tab')
+        pyautogui.press('enter')
 
 
 def print_screen():
@@ -132,7 +133,6 @@ def print_screen():
     Print da primeira tela e atualização da altura e largura do monitor
     :return: Array
     """
-    global screen_width, screen_height
     sct_img = None
     if platform.system() != 'Linux':
         with mss.mss() as sct:
@@ -141,7 +141,6 @@ def print_screen():
     else:
         sct_img = pyautogui.screenshot()
 
-    screen_width, screen_height = sct_img.size
     return np.array(sct_img)
 
 
@@ -239,6 +238,7 @@ def login(window):
             time.sleep(0.7)
             pyautogui.write(window['password'], interval=0.1)
             if found_img(window, "login.png", True):
+                found_img(window, "ok.png", True, refresh=False, max_attempt=5)
                 if found_img(window, "invalid_credentials.png", refresh=False, max_attempt=7):
                     window['window'].close()
                     msg = f"Janela {window['index']}:"
@@ -347,10 +347,7 @@ def notify_ammount_bcoin(window):
             template = cv2.imread(img_path + "bcoins.png", 0)
             w, h = template.shape[::-1]
             res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
-            # Threshold tem que ser 0.8 mesmo, é proposital, pq a imagem
-            # "bcoins.png" não possui o número de moedas, daí um match de
-            # 0.9 pra cima é impossível
-            loc = np.where(res >= 0.8)
+            loc = np.where(res >= threshold)
             if len(loc[0]) > 0:
                 _, _, _, max_loc = cv2.minMaxLoc(res)
                 crop = img_rgb[max_loc[1]:max_loc[1] + h, max_loc[0]:max_loc[0] + w]

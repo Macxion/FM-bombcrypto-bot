@@ -1,5 +1,11 @@
 # Log de atualizações
 
+### Update em 18/03/2022
+#### Versão do game: 36
+* Adicionado o aceite do aviso de quando o login é feito via 
+username e password.
+* Threshold global calibrado para 0.7.
+---
 ### Update em 06/03/2022
 #### Versão do game: 35
 * Alteração das imagens de conectar, quantidade de BCOIN, campo

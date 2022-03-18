@@ -5,7 +5,7 @@
 # ele está errando, pela mesma imagem, na sua resolução, assim irá funcionar, o padrão
 # é 0.9
 # !APENAS VALORES NUMÉRICOS de 0.6 até 0.9
-threshold = 0.8
+threshold = 0.7
 
 # Delay para logar novamente e colocar todos os bhero para trabalhar, informe sempre
 # o tempo em segundos, calcule um tempo legal em que todos os seus bhero se recuperam
