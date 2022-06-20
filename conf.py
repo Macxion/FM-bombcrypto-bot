@@ -18,7 +18,7 @@ time_to_rest = 4400
 # vai voltar na tela inicial para evitar o bug do rollback (uhmm²), sempre informe o
 # tempo em segundos, 360 segundos (6m) é o padrão
 # !APENAS VALORES NUMÉRICOS
- time_to_refresh = 360
+time_to_refresh = 360
 
 # Número de tentavivas para procurar uma imagem requerida, se o bot não encontrar a
 # imagem que procura, irá reinciar o processo novamente (recarregar o browser, conectar
