@@ -4,3 +4,4 @@ opencv-python
 PyAutoGUI
 PyGetWindow
 requests
+pytesseract

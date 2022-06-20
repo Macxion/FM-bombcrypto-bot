@@ -6,6 +6,7 @@ import cv2
 import requests
 import numpy as np
 import platform
+import pytesseract
 if platform.system() != 'Linux':
     import pygetwindow
     import mss
@@ -81,6 +82,7 @@ def get_windows_running_game():
             windows.append({
                 'window': w,
                 'index': str(i),
+                'name': 'Janela',
                 'login': False,
                 'working': False,
                 'farming': False,
@@ -99,6 +101,7 @@ def get_windows_running_game():
             for x in range(len(user_list)):
                 windows.append({
                     'index': str(i),
+                    'name': 'Aba',
                     'login': False,
                     'working': False,
                     'farming': False,
@@ -114,10 +117,9 @@ def get_windows_running_game():
 
     n = len(windows)
     s = '' if n == 1 else 's'
-    aj = 'janela' if login_with_metamask else 'aba'
-    msg = f"Nenhuma {aj} encontrada! Finalizando..." \
+    msg = f"Nenhuma janela encontrada! Finalizando..." \
         if n == 0 else \
-        f"Opa, encontrei {n} {aj}{s} do browser rodando o Bombcrypto, iniciando os trabalhos..."
+        f"Opa, encontrei {n} janela{s} do browser rodando o Bombcrypto, iniciando os trabalhos..."
     telegram_send(msg)
     # Não é login com a Metamask, portando não há controle de janelas, agora são abas,
     # serve para sair do terminal aberto, se houver abas
@@ -178,8 +180,8 @@ def found_img(window, img, click=False, refresh=True, max_attempt=0):
 
     if attempt == true_max_attempt:
         window['login'] = False
-        telegram_send(f"Janela {window['index']}: {true_max_attempt} tentativas atingidas ao procurar a imagem {img}")
         if refresh:
+            telegram_send(f"{window['name']} {window['index']}: {true_max_attempt} tentativas atingidas ao procurar a imagem {img}")
             reload(window)
 
         return False
@@ -203,6 +205,7 @@ def accept_terms_if_did_not(window):
             continue
         else:
             if not found_img(window, "connect_wallet.png", refresh=False, max_attempt=5):
+                telegram_send('connect não encontrada')
                 if found_img(window, "i_accept.png", True):
                     return found_img(window, "accept.png", True)
 
@@ -218,7 +221,7 @@ def connect_wallet(window):
             login(window) if not login_with_metamask else connect_with_metamask(window)
             if not window['login'] and found_img(window, "treasure_hunt.png"):
                 login_method = "com usuário e senha" if not login_with_metamask else "via Metamask"
-                telegram_send(f"Janela {window['index']}: conectado {login_method}")
+                telegram_send(f"{window['name']} {window['index']}: conectado {login_method}")
                 window['login'] = True
                 window['time_to_refresh'] = time.time()
                 if window['time_to_rest'] == 0:
@@ -240,8 +243,7 @@ def login(window):
             if found_img(window, "login.png", True):
                 found_img(window, "ok.png", True, refresh=False, max_attempt=5)
                 if found_img(window, "invalid_credentials.png", refresh=False, max_attempt=7):
-                    window['window'].close()
-                    msg = f"Janela {window['index']}:"
+                    msg = f"{window['name']} {window['index']}:"
                     telegram_send(f"{msg} credenciais inválidas, fechando janela...")
                     for i in range(len(windows)):
                         if windows[i]['index'] == window['index']:
@@ -286,7 +288,7 @@ def go_to_work(window):
                 if found_img(window, "close_work.png", True):
                     if found_img(window, "treasure_hunt.png"):
                         window['working'] = True
-                        telegram_send(f"Janela {window['index']}: Todos os bhero colocados para trabalhar")
+                        telegram_send(f"{window['name']} {window['index']}: Todos os bhero colocados para trabalhar")
 
 
 def go_to_treasure_hunt(window):
@@ -298,7 +300,7 @@ def go_to_treasure_hunt(window):
     if window['login'] and not window['farming']:
         if found_img(window, "treasure_hunt.png", True):
             window['farming'] = True
-            telegram_send(f"Janela {window['index']}: farmando no treasure hunt...")
+            telegram_send(f"{window['name']} {window['index']}: farmando no treasure hunt...")
 
 
 def go_back_main_if_no_error(window):
@@ -308,6 +310,7 @@ def go_back_main_if_no_error(window):
     :return: None
     """
     if window['login']:
+        notify_ammount_bcoin(window)
         found_error_bar = False
         for error_bar in ['error_bar_.png', 'error_bar.png']:
             img_rgb = print_screen()
@@ -322,7 +325,7 @@ def go_back_main_if_no_error(window):
         if not found_error_bar:
             def back():
                 if found_img(window, "back.png", True):
-                    telegram_send(f"Janela {window['index']}: voltando para a tela inicial")
+                    telegram_send(f"{window['name']} {window['index']}: voltando para a tela inicial")
                     time.sleep(3)
 
             back() if found_img(window, "new_map.png", True, False, 3) else back()
@@ -339,7 +342,7 @@ def notify_ammount_bcoin(window):
     hr_max = hr_config + datetime.timedelta(seconds=time_to_refresh)
     hr_config = hr_config.time()
     hr_max = hr_max.time()
-    if window['login'] and window['farming'] and hr_config <= hr_now < hr_max:
+    if window['login'] and window['farming']:
         if found_img(window, "chest.png", True):
             time.sleep(3)
             img_rgb = print_screen()
@@ -351,11 +354,24 @@ def notify_ammount_bcoin(window):
             if len(loc[0]) > 0:
                 _, _, _, max_loc = cv2.minMaxLoc(res)
                 crop = img_rgb[max_loc[1]:max_loc[1] + h, max_loc[0]:max_loc[0] + w]
-                write_status = cv2.imwrite(img_path + "ammount_bcoin.jpg", crop)
-                if write_status is True and found_img(window, "close_chest.png", True):
-                    msg = f"Janela {window['index']}: total de BCOIN até o momento"
+                write = cv2.imwrite(img_path + "ammount_bcoin.jpg", crop)
+                if write:
+                    img = cv2.imread(img_path + "ammount_bcoin.jpg")
+                    custom_config = r'--oem 3 --psm 6 outputbase digits'
+                    if platform.system() == 'Windows':
+                        pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+                    qtd_token = pytesseract.image_to_string(img, config=custom_config)
+                    import db
+                    date_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    db.add(date_time, qtd_token, 'bcoin', window['username'])
+                    qtd_month = db.sum_month('bcoin')
+                    msg = f"{window['name']} {window['index']}: total de BCOIN até o momento: {qtd_token}\n" \
+                          f"total de BCOIN no mês: {qtd_month}"
                     telegram_send_photo(img_path + "ammount_bcoin.jpg", msg)
                     os.remove(img_path + "ammount_bcoin.jpg")
+
+                return found_img(window, "close_chest.png", True)
 
 
 def reload(window):
@@ -366,7 +382,10 @@ def reload(window):
     """
     pyautogui.hotkey('ctrl', 'shift', 'r')
     time.sleep(3)
-    telegram_send(f"Janela {window['index']}: recarregando o browser...")
+    pyautogui.hotkey('up')
+    pyautogui.hotkey('up')
+    pyautogui.hotkey('down')
+    telegram_send(f"{window['name']} {window['index']}: recarregando o browser...")
 
 
 def actions(window):
@@ -379,13 +398,12 @@ def actions(window):
         if (time.time() - window['time_to_rest']) >= time_to_rest:
             window['time_to_rest'] = time.time()
             window['working'] = False
-            telegram_send(f"Janela {window['index']}: Tempo máximo de descanso de {time_to_rest} segundos "
-                          f"iniciado, os bhero trabalharão após o login")
+            telegram_send(f"{window['name']} {window['index']}: Tempo máximo de descanso de {time_to_rest} segundos "
+                          f"iniciado, os bheroes trabalharão após o login")
 
-        notify_ammount_bcoin(window)
         go_back_main_if_no_error(window)
-        telegram_send(f"Janela {window['index']}: Tempo máximo de {time_to_refresh} segundos para recarregar "
-                      f"iniciado, para fugir do bug dos blocos indestrutíveis ou corrigir algum bhero bugado")
+        telegram_send(f"{window['name']} {window['index']}: Tempo máximo de {time_to_refresh} segundos para recarregar "
+                      f"iniciado")
         window['time_to_refresh'] = time.time()
         window['login'] = window['farming'] = False
         reload(window)
