@@ -55,9 +55,7 @@ sempre deve ser maior que o **time_to_refresh**, o arquivo
 **conf.py** tem as instruções de cada variável.
 
 Este é o fluxo do bot! Futuramente, novas funcionalidades
-poderão ser adicionadas dependendo do interesse da
-comunidade, do nosso tempo e claro, das **donnations**
-né my blessed?!
+poderão ser adicionadas (ou não).
 
 ## Limitações
 O bot fica analizando prints da sua tela no momento
@@ -101,16 +99,12 @@ ali em capacidades, execute o comando:
 aperte ENTER.
 * Para cancelar o bot, basta executar um **Ctrl + c**
 no terminal.
-* Lembre-se de sempre acessar o Bombcrypto pelo endereço
-**https://app.bombcrypto.io/webgl/index.html**.
   
 ## Conseguimos te ajudar?
 ### Consegue ganhar dinheiro enquanto faz outras coisas utilizando nosso bot?
 Se a resposta for sim, que bom que te ajudamos! Para
 ajudar o projeto a crescer mais ainda e motivar as
 pessoas por trás disso, considere fazer uma doação.
-#### 🎶 Dê um trocado a seus Devs, oh vale abundante, oh vale abundante, ôô Ô ... 🎵
-
 Utilize o QR-Code ou copie o endereço da carteira
 do projeto para transferir.
 

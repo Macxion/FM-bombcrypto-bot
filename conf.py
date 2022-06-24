@@ -13,9 +13,7 @@ threshold = 0.7
 # !APENAS VALORES NUMÉRICOS
 time_to_rest = 4400
 
-# Delay para logar novamente e fugir do erro das pedras com vida infinita (uhmm)
-# e também salvar algum eventual bhero bugado no mapa, antes de dar o refresh, o bot
-# vai voltar na tela inicial para evitar o bug do rollback (uhmm²), sempre informe o
+# Delay para logar novamente, sempre informe o
 # tempo em segundos, 360 segundos (6m) é o padrão
 # !APENAS VALORES NUMÉRICOS
 time_to_refresh = 360
@@ -24,7 +22,7 @@ time_to_refresh = 360
 # imagem que procura, irá reinciar o processo novamente (recarregar o browser, conectar
 # no jogo, etc...), 60 é o valor padrão, dá aproximadamente 1m procurando uma imagem
 # !APENAS VALORES NUMÉRICOS
-max_attempt_found_img = 30
+max_attempt_found_img = 60
 
 # Se deseja ou não fazer login utilizando a Metamask, o padrão é True, mas, se você
 # optar por False, tenha certeza de já ter criado seu login de usuário do Bombcrypto,
@@ -52,7 +50,7 @@ login_credentials = {
 # normalmente, se por algum motivo ele parar de notificar, você tem a ciência de que
 # o programa parou de executar
 # !APENAS VALORES BOOLEANOS, True OU False, SEM ASPAS
-telegram_notify = True
+telegram_notify = False
 
 # Se decidiu receber notificações por telegram, informe o token de autenticação recebido
 # ao falar com o @BotFather, no próprio telegram mesmo, igual o site oficial orienta
@@ -67,8 +65,3 @@ bot_token = ''
 # recebido, esse é o chatId
 # !APENAS VALORES DE TEXTO, COM ASPAS
 chat_id = ''
-
-# Informe a partir de que horário (formato 24h, ex: 15:30) deseja que o bot envie um print da
-# quantia total de bcoin até o momento, pelo Telegram, apenas uma vez, a cada 24h
-# !APENAS VALORES DE TEXTO, COM ASPAS
-time_notify_ammount_of_bcoin = '20:37'

@@ -310,7 +310,6 @@ def go_back_main_if_no_error(window):
     :return: None
     """
     if window['login']:
-        notify_ammount_bcoin(window)
         found_error_bar = False
         for error_bar in ['error_bar_.png', 'error_bar.png']:
             img_rgb = print_screen()
@@ -337,11 +336,11 @@ def notify_ammount_bcoin(window):
     :param window: Janela atual (multijanelas)
     :return: None
     """
-    hr_now = datetime.datetime.now().time()
-    hr_config = datetime.datetime.strptime(time_notify_ammount_of_bcoin, '%H:%M')
-    hr_max = hr_config + datetime.timedelta(seconds=time_to_refresh)
-    hr_config = hr_config.time()
-    hr_max = hr_max.time()
+    #hr_now = datetime.datetime.now().time()
+    #hr_config = datetime.datetime.strptime(time_notify_ammount_of_bcoin, '%H:%M')
+    #hr_max = hr_config + datetime.timedelta(seconds=time_to_refresh)
+    #hr_config = hr_config.time()
+    #hr_max = hr_max.time()
     if window['login'] and window['farming']:
         if found_img(window, "chest.png", True):
             time.sleep(3)
@@ -398,6 +397,7 @@ def actions(window):
         if (time.time() - window['time_to_rest']) >= time_to_rest:
             window['time_to_rest'] = time.time()
             window['working'] = False
+            notify_ammount_bcoin(window)
             telegram_send(f"{window['name']} {window['index']}: Tempo máximo de descanso de {time_to_rest} segundos "
                           f"iniciado, os bheroes trabalharão após o login")
 
