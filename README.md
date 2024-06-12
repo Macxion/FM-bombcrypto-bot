@@ -1,5 +1,7 @@
 # FM-bombcrypto-bot
 
+🚫 **REPOSITÓRIO ARQUIVADO** 🚫
+
 Antes de começar, fique sempre de olho no **[CHANGELOG](CHANGELOG.md)** para saber
 quais foram as últimas atualizações do Bot, obrigado!
 
